@@ -1,17 +1,12 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.net.URL;
 
 public class Compresseur {
 	
 	private static File getFile() {
 		BufferedReader buffReader = new BufferedReader(new InputStreamReader(System.in));
-		System.out.println("Entrer le lien du texte à décompresser.");
-		File file = null;
+		System.out.println("Entrer le lien du texte ï¿½ dï¿½compresser.");
+		File file=null;
 		try {
 			String filePath = "file:///" + buffReader.readLine();
 			URL url = new URL(filePath);
@@ -24,29 +19,29 @@ public class Compresseur {
 		return file;
 	}
 	
-	private static void readFile(File f){
-		FileInputStream fileInputStream;
+	public void readFile(File f){
+		BufferedReader br = null;
+
 		try {
-			fileInputStream = new FileInputStream(f);
-			char current;
-			
-			while (fileInputStream.available() > 0) {
-				current = (char) fileInputStream.read();
-				System.out.print(current);
+			String current;
+
+			br = new BufferedReader(new FileReader(f));
+
+			while ((current = br.readLine()) != null) {
+				System.out.println(current);
 			}
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			try {
+				if (br != null)br.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
 		}	
 	}
 
-	public static void main(String[] args) {
-		File f = getFile();
-		readFile(f);
-		
-	}
+
 
 }
