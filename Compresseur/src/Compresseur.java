@@ -92,33 +92,31 @@ public class Compresseur {
 	}
 	//Passer a travers la liste pour les placer en ordre
 	private static void quickSort(ArrayList<ArrayList<Object>> tableauDeFrequences,int debut,int fin)
-	{	
-		int i = debut;
-        int j = fin; 
-		if (i < j) {
-			ArrayList<Object> pivot = tableauDeFrequences.get(debut);
-			while (j > i){
-				  while ((Integer)tableauDeFrequences.get(i).get(1) >= (Integer)pivot.get(1) && i <= fin && j > i) { 
-                      System.out.println((Integer)tableauDeFrequences.get(i).get(1));
-				  	  System.out.println((Integer)pivot.get(1));
-					  i++;
-				  }
-				  
-				  while ((Integer)tableauDeFrequences.get(j).get(1) <= (Integer)pivot.get(1) && j >= debut && j > i){ 
-					  System.out.println((Integer)tableauDeFrequences.get(j).get(1));
-				  	  System.out.println((Integer)pivot.get(1));
-					  j--;
-					  
-				  }
-				  if (i < j) {
-						echanger(tableauDeFrequences,i,j);
-				  }
-			}
-			echanger(tableauDeFrequences,debut,j);
-			
-			quickSort(tableauDeFrequences, debut, j - 1); 
-			quickSort(tableauDeFrequences, j + 1, fin);
-		}
+	{	//http://java2novice.com/java-sorting-algorithms/quick-sort/
+		ArrayList<Object> pivot = new ArrayList<Object>();
+        int i = debut;
+        int j = fin;
+        pivot = tableauDeFrequences.get(debut+(fin-debut)/2);
+        while (i <= j) {
+
+            while ((Integer)tableauDeFrequences.get(i).get(1) > (Integer)pivot.get(1)) {
+                i++;
+            }
+            while ((Integer)tableauDeFrequences.get(j).get(1) < (Integer)pivot.get(1)) {
+                j--;
+            }
+            if (i <= j) {
+                echanger(tableauDeFrequences, i, j);
+                //move index to next position on both sides
+                i++;
+                j--;
+            }
+        }
+        // call quickSort() method recursively
+        if (debut < j)
+            quickSort(tableauDeFrequences, debut, j);
+        if (i < fin)
+            quickSort(tableauDeFrequences, i, fin);
 	}
 	
 	private static void echanger (ArrayList<ArrayList<Object>> tableauDeFrequences,int indexGrand,int indexPetit) {
