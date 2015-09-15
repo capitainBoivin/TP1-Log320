@@ -1,12 +1,6 @@
 import java.io.*;
-import java.lang.reflect.Array;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
+
 
 public class Compresseur {
 
@@ -38,6 +32,11 @@ public class Compresseur {
 			while ((current = br.readLine()) != null) {
 				verfierTable(current);
 			}
+			for(int i=0; i<freqTab.size(); i++) {
+				System.out.println(freqTab.get(i).get(0)+ " " + freqTab.get(i).get(1));
+			}
+			System.out.println("============================");
+			quickSort(freqTab,0,freqTab.size()-1);
 			for(int i=0; i<freqTab.size(); i++) {
 				System.out.println(freqTab.get(i).get(0)+ " " + freqTab.get(i).get(1));
 			}
@@ -77,10 +76,9 @@ public class Compresseur {
 		{
 			boolean done = false;
 			for (int i=0; i<freqTab.size(); i++) {
-				System.out.println(freqTab.get(i).get(0));
 				if ((freqTab.get(i).get(0)) == (Object)lettre){
-					Integer freq = (Integer)(freqTab.get(i)).get(1);
-					freqTab.get(i).set(1, freq++);
+					Integer freq = (Integer)(freqTab.get(i)).get(1) + 1;
+					freqTab.get(i).set(1, freq);
 					done = true;
 				}
 			}
@@ -93,8 +91,41 @@ public class Compresseur {
 		}
 	}
 	//Passer a travers la liste pour les placer en ordre
-	void ordonner()
-	{
-	
+	private static void quickSort(ArrayList<ArrayList<Object>> tableauDeFrequences,int debut,int fin)
+	{	
+		int i = debut;
+        int j = fin; 
+		if (i < j) {
+			ArrayList<Object> pivot = tableauDeFrequences.get(debut);
+			while (j > i){
+				  while ((Integer)tableauDeFrequences.get(i).get(1) >= (Integer)pivot.get(1) && i <= fin && j > i) { 
+                      System.out.println((Integer)tableauDeFrequences.get(i).get(1));
+				  	  System.out.println((Integer)pivot.get(1));
+					  i++;
+				  }
+				  
+				  while ((Integer)tableauDeFrequences.get(j).get(1) <= (Integer)pivot.get(1) && j >= debut && j > i){ 
+					  System.out.println((Integer)tableauDeFrequences.get(j).get(1));
+				  	  System.out.println((Integer)pivot.get(1));
+					  j--;
+					  
+				  }
+				  if (i < j) {
+						echanger(tableauDeFrequences,i,j);
+				  }
+			}
+			echanger(tableauDeFrequences,debut,j);
+			
+			quickSort(tableauDeFrequences, debut, j - 1); 
+			quickSort(tableauDeFrequences, j + 1, fin);
+		}
 	}
+	
+	private static void echanger (ArrayList<ArrayList<Object>> tableauDeFrequences,int indexGrand,int indexPetit) {
+		System.out.println("dans le echanger");
+		ArrayList<Object> tempo = tableauDeFrequences.get(indexGrand);
+		tableauDeFrequences.set(indexGrand, tableauDeFrequences.get(indexPetit));
+		tableauDeFrequences.set(indexPetit, tempo);
+	}
+	
 }
