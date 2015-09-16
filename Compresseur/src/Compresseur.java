@@ -5,9 +5,11 @@ import java.util.HashMap;
 
 public class Compresseur {
 
-	HashMap<Character, Integer> freqMap = new HashMap<Character, Integer>();
-	ArrayList<ArrayList<Object>> freqTab = new ArrayList<ArrayList<Object>>();
-	
+	private HashMap<Character, Integer> freqMap = new HashMap<Character, Integer>();
+	private ArrayList<ArrayList<Object>> freqTab = new ArrayList<ArrayList<Object>>();
+	private int somChar=0;
+	private Node racine;
+
 	public void readFile(File f){
 		BufferedReader br = null;
 
@@ -23,9 +25,14 @@ public class Compresseur {
 			}
 			System.out.println("============================");
 			quickSort(freqTab,0,freqTab.size()-1);
+
+			System.out.println(freqTab);
 			for(int i=0; i<freqTab.size(); i++) {
-				System.out.println(freqTab.get(i).get(0)+ " " + freqTab.get(i).get(1));
+				this.addNode(freqTab.get(i).get(0),freqTab.get(i).get(1));
+				//System.out.println(freqTab.get(i).get(0)+ " " + freqTab.get(i).get(1));
 			}
+			System.out.println("============================");
+			this.lectureEnOrdreArbre(this.racine);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -43,6 +50,7 @@ public class Compresseur {
 		//Passer a travers les mots
 		for (char lettre: mot.toCharArray())
 		{
+			somChar++;
 			if(freqMap.get(lettre)==null)
 			{
 				freqMap.put(lettre,freqTab.size());
@@ -59,20 +67,6 @@ public class Compresseur {
 				tempo.set(1,frequence);
 				freqTab.set(indexAAjuster,tempo);
 			}
-			/*boolean done = false;
-			for (int i=0; i<freqTab.size(); i++) {
-				if ((freqTab.get(i).get(0)) == (Object)lettre){
-					Integer freq = (Integer)(freqTab.get(i)).get(1) + 1;
-					freqTab.get(i).set(1, freq);
-					done = true;
-				}
-			}
-			if (done == false) {
-					ArrayList<Object> tempo = new ArrayList <Object>();
-					tempo.add(0,lettre);
-					tempo.add(1,1);
-					freqTab.add(tempo);
-			}*/
 		}
 	}
 	//Passer a travers la liste pour les placer en ordre
@@ -109,5 +103,65 @@ public class Compresseur {
 		tableauDeFrequences.set(indexGrand, tableauDeFrequences.get(indexPetit));
 		tableauDeFrequences.set(indexPetit, tempo);
 	}
-	
+
+
+	/*--------------------------Arbre---------------------------*/
+
+	public void addNode(Object clef,Object freq)
+	{
+		Node newNode=new Node(clef,freq);
+
+		if (racine==null)
+		{
+			racine=newNode;
+		}
+		else
+		{
+			Node nodeActive=racine;
+
+			Node parent;
+
+			while (true)
+			{
+				parent =nodeActive;
+
+				nodeActive=nodeActive.leftChild;
+
+				if (nodeActive==null)
+				{
+					parent.leftChild=newNode;
+					return;
+				}
+				else
+				{
+					nodeActive=nodeActive.rightChild;
+					if (nodeActive==null) {
+						parent.rightChild = newNode;
+						return;
+					}
+				}
+
+			}
+		}
+	}
+
+	public void lectureEnOrdreArbre(Node nodeActive)
+	{
+
+		if(nodeActive!=null)
+		{
+			//Voir gauche remonter de 1 et aller a droite
+			//System.out.println(nodeActive);
+
+			lectureEnOrdreArbre(nodeActive.leftChild);
+
+			//Par ordre de grandeur
+			//System.out.println(nodeActive);
+
+			lectureEnOrdreArbre(nodeActive.rightChild);
+
+			//Check les deux child dun noeuds et ensuite on remonte
+			//System.out.println(nodeActive);
+		}
+	}
 }
