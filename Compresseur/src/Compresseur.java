@@ -1,26 +1,12 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class Compresseur {
 
-	//HashMap<String, Integer> freqMap = new HashMap<String, Integer>();
+	HashMap<Character, Integer> freqMap = new HashMap<Character, Integer>();
 	ArrayList<ArrayList<Object>> freqTab = new ArrayList<ArrayList<Object>>();
-	/*private static File getFile() {
-		BufferedReader buffReader = new BufferedReader(new InputStreamReader(System.in));
-		System.out.println("Entrer le lien du texte � d�compresser.");
-		File file=null;
-		try {
-			String filePath = "file:///" + buffReader.readLine();
-			URL url = new URL(filePath);
-			file = new File(url.getFile());
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return file;
-	}*/
 	
 	public void readFile(File f){
 		BufferedReader br = null;
@@ -51,30 +37,29 @@ public class Compresseur {
 			}
 		}	
 	}
-
-	/*void verfierTable(String mot)
-	{
-		//Passer a travers les mots
-		for (char lettre: mot.toCharArray())
-		{
-			for 
-			if(freqMap.get(lettre+"")!=null)
-			{
-				freqMap.put(lettre+"",freqMap.get(lettre+"")+1);
-			}
-			else
-			{
-				freqMap.put(lettre+"",1);
-			}
-		}
-	}*/
 	
 	void verfierTable(String mot)
 	{
 		//Passer a travers les mots
 		for (char lettre: mot.toCharArray())
 		{
-			boolean done = false;
+			if(freqMap.get(lettre)==null)
+			{
+				freqMap.put(lettre,freqTab.size());
+				ArrayList<Object> tempo = new ArrayList<Object>();
+				tempo.add(lettre);
+				tempo.add(1);
+				freqTab.add(tempo);
+			}
+			else
+			{
+				int indexAAjuster = freqMap.get(lettre);
+				int frequence =(Integer) freqTab.get(indexAAjuster).get(1)+1;
+				ArrayList<Object> tempo = freqTab.get(indexAAjuster);
+				tempo.set(1,frequence);
+				freqTab.set(indexAAjuster,tempo);
+			}
+			/*boolean done = false;
 			for (int i=0; i<freqTab.size(); i++) {
 				if ((freqTab.get(i).get(0)) == (Object)lettre){
 					Integer freq = (Integer)(freqTab.get(i)).get(1) + 1;
@@ -87,7 +72,7 @@ public class Compresseur {
 					tempo.add(0,lettre);
 					tempo.add(1,1);
 					freqTab.add(tempo);
-			}
+			}*/
 		}
 	}
 	//Passer a travers la liste pour les placer en ordre
@@ -120,7 +105,6 @@ public class Compresseur {
 	}
 	
 	private static void echanger (ArrayList<ArrayList<Object>> tableauDeFrequences,int indexGrand,int indexPetit) {
-		System.out.println("dans le echanger");
 		ArrayList<Object> tempo = tableauDeFrequences.get(indexGrand);
 		tableauDeFrequences.set(indexGrand, tableauDeFrequences.get(indexPetit));
 		tableauDeFrequences.set(indexPetit, tempo);
