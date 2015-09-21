@@ -45,7 +45,56 @@ public class Compresseur {
 			}
 		}	
 	}
-	
+
+
+	//Faudrait passer le texte et une charactere a la fois et on sait que chacun des charactere exsite dans ils ont ete
+	//denombre, par la suite on passe a travers la larbre a la recherhe et la lettre et ajoute les 0 et 1
+	void encoder()
+	{
+		String code="0";
+		nodeActive=racine;
+		// Lire le fichier et mettre les zeros avant et apres chaque lettre pour faire la separation
+
+		//placeHolder
+		Object lettre=null;
+		char aTrouver='a';
+		//placeholder
+
+		while(true)
+		{
+			if (lettre.equals(aTrouver)) {
+				code += "0";
+				return;
+			} else {
+				code += 1;
+				nodeActive = nodeActive.rightChild;
+			}
+		}
+
+	}
+
+	// parcourir et prendre entre les 0 trouve
+	void decoder()
+	{
+	//Chacun des characteres entre 0 et 1
+		nodeActive=racine;
+		char binaire='0';
+		Object trouver;
+		if(binaire==1)
+		{
+			nodeActive=nodeActive.rightChild;
+		}
+		else
+		{
+			trouver=nodeActive.clef;
+		}
+	//Ensuite mettre les lettres une apres lautre.
+
+	}
+
+
+
+	//Permet de traverser l'arbre
 	void verfierTable(String mot)
 	{
 		//Passer a travers les mots
