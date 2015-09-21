@@ -6,8 +6,8 @@ public class Node {
     Object clef,freq;
 
 
-    Node leftChild;
-    Node rightChild;
+    Node leftChild=null;
+    Node rightChild=null;
 
     Node(Object clef,Object freq)
     {

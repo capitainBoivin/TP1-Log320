@@ -9,6 +9,7 @@ public class Compresseur {
 	private ArrayList<ArrayList<Object>> freqTab = new ArrayList<ArrayList<Object>>();
 	private int somChar=0;
 	private Node racine;
+	private Node nodeActive;
 
 	public void readFile(File f){
 		BufferedReader br = null;
@@ -20,18 +21,18 @@ public class Compresseur {
 			while ((current = br.readLine()) != null) {
 				verfierTable(current);
 			}
-			for(int i=0; i<freqTab.size(); i++) {
+			/*for(int i=0; i<freqTab.size(); i++) {
 				System.out.println(freqTab.get(i).get(0)+ " " + freqTab.get(i).get(1));
-			}
-			System.out.println("============================");
+			}*/
+			//System.out.println("============================");
 			quickSort(freqTab,0,freqTab.size()-1);
 
-			System.out.println(freqTab);
+			//System.out.println(freqTab);
 			for(int i=0; i<freqTab.size(); i++) {
 				this.addNode(freqTab.get(i).get(0),freqTab.get(i).get(1));
 				//System.out.println(freqTab.get(i).get(0)+ " " + freqTab.get(i).get(1));
 			}
-			System.out.println("============================");
+			//System.out.println("============================");
 			this.lectureEnOrdreArbre(this.racine);
 
 		} catch (IOException e) {
@@ -113,37 +114,22 @@ public class Compresseur {
 
 		if (racine==null)
 		{
-			racine=newNode;
+			racine=new Node(null,somChar);
+			//racine=newNode;
+			nodeActive=racine;
 		}
-		else
-		{
-			Node nodeActive=racine;
 
-			Node parent;
-
-			while (true)
+			if (nodeActive.leftChild==null)
 			{
-				parent =nodeActive;
+				//System.out.println("new node"+newNode);
+				nodeActive.leftChild=newNode;
+				somChar=somChar-(Integer)freq;
 
-				nodeActive=nodeActive.leftChild;
-
-				if (nodeActive==null)
-				{
-					parent.leftChild=newNode;
-					return;
-				}
-				else
-				{
-					nodeActive=nodeActive.rightChild;
-					if (nodeActive==null) {
-						parent.rightChild = newNode;
-						return;
-					}
-				}
-
+				nodeActive.rightChild = new Node(null,somChar);
+				nodeActive=nodeActive.rightChild;
 			}
+
 		}
-	}
 
 	public void lectureEnOrdreArbre(Node nodeActive)
 	{
@@ -151,7 +137,7 @@ public class Compresseur {
 		if(nodeActive!=null)
 		{
 			//Voir gauche remonter de 1 et aller a droite
-			//System.out.println(nodeActive);
+			System.out.println(nodeActive);
 
 			lectureEnOrdreArbre(nodeActive.leftChild);
 
