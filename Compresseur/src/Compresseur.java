@@ -48,6 +48,7 @@ public class Compresseur {
 	{
 		// Lire le fichier et mettre les zeros avant et apres chaque lettre pour faire la separation
 		String code="";
+		//Juste changer le nom du user :P
 		String fileEncoder = "C:\\Users\\maaj\\Desktop\\encode.txt";
 
 		for(char aTrouver: texte.toCharArray()){
