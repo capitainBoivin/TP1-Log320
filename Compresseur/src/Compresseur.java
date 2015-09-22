@@ -46,13 +46,14 @@ public class Compresseur {
 	//denombre, par la suite on passe a travers la larbre a la recherhe et la lettre et ajoute les 0 et 1
 	void encoder()
 	{
-		
 		// Lire le fichier et mettre les zeros avant et apres chaque lettre pour faire la separation
+		String code="";
+		String fileEncoder = "C:\\Users\\maaj\\Desktop\\encode.txt";
+
 		for(char aTrouver: texte.toCharArray()){
-			String code="";
 			nodeActive=racine;
 			boolean continuer = true;
-	
+
 			while(continuer)
 			{		
 				if (nodeActive.leftChild.clef.equals(aTrouver)) {
@@ -63,7 +64,20 @@ public class Compresseur {
 					nodeActive = nodeActive.rightChild;
 				}
 			}
-			System.out.println(code);
+			//System.out.println(code);
+		}
+		try
+		{
+			byte[] buffer = code.getBytes();
+			FileOutputStream outputStream = new FileOutputStream(fileEncoder);
+			outputStream.write(buffer);
+			outputStream.close();
+			System.out.println("Wrote " + buffer.length +
+					" bytes");
+		}
+		catch(IOException ex)
+		{
+			ex.printStackTrace();
 		}
 	}
 
