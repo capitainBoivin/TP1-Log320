@@ -10,24 +10,19 @@ public class Compresseur {
 	private int somChar=0;
 	private Node racine;
 	private Node nodeActive;
-	private String texte;
+	private String texte = "";
+	private String ligne;
 
 	public void readFile(File f){
 		BufferedReader br = null;
 
 		try {
 			br = new BufferedReader(new FileReader(f));
-
-			while ((texte = br.readLine()) != null) {
-				verfierTable(texte);
+			while ((ligne = br.readLine()) != null) {
+				verfierTable(ligne);
+				texte += ligne;
 			}
-			/*for(int i=0; i<freqTab.size(); i++) {
-				System.out.println(freqTab.get(i).get(0)+ " " + freqTab.get(i).get(1));
-			}*/
-			//System.out.println("============================");
 			quickSort(freqTab,0,freqTab.size()-1);
-
-			//System.out.println(freqTab);
 			for(int i=0; i<freqTab.size(); i++) {
 				this.addNode(freqTab.get(i).get(0),freqTab.get(i).get(1));
 				//System.out.println(freqTab.get(i).get(0)+ " " + freqTab.get(i).get(1));
@@ -51,26 +46,25 @@ public class Compresseur {
 	//denombre, par la suite on passe a travers la larbre a la recherhe et la lettre et ajoute les 0 et 1
 	void encoder()
 	{
-		String code="0";
-		nodeActive=racine;
+		
 		// Lire le fichier et mettre les zeros avant et apres chaque lettre pour faire la separation
-
-		//placeHolder
-		char aTrouver='a';
-		//placeholder
-		boolean continuer = true;
-
-		while(continuer)
-		{		
-			if (nodeActive.leftChild.clef.equals(aTrouver)) {
-				code += "0";
-				continuer = false;
-			} else {
-				code += 1;
-				nodeActive = nodeActive.rightChild;
+		for(char aTrouver: texte.toCharArray()){
+			String code="";
+			nodeActive=racine;
+			boolean continuer = true;
+	
+			while(continuer)
+			{		
+				if (nodeActive.leftChild.clef.equals(aTrouver)) {
+					code += "0";
+					continuer = false;
+				} else {
+					code += 1;
+					nodeActive = nodeActive.rightChild;
+				}
 			}
+			System.out.println(code);
 		}
-		System.out.println(code);
 	}
 
 	// parcourir et prendre entre les 0 trouve
