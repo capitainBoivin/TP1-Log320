@@ -10,16 +10,16 @@ public class Compresseur {
 	private int somChar=0;
 	private Node racine;
 	private Node nodeActive;
+	private String texte;
 
 	public void readFile(File f){
 		BufferedReader br = null;
 
 		try {
-			String current;
 			br = new BufferedReader(new FileReader(f));
 
-			while ((current = br.readLine()) != null) {
-				verfierTable(current);
+			while ((texte = br.readLine()) != null) {
+				verfierTable(texte);
 			}
 			/*for(int i=0; i<freqTab.size(); i++) {
 				System.out.println(freqTab.get(i).get(0)+ " " + freqTab.get(i).get(1));
@@ -33,8 +33,8 @@ public class Compresseur {
 				//System.out.println(freqTab.get(i).get(0)+ " " + freqTab.get(i).get(1));
 			}
 			//System.out.println("============================");
-			this.lectureEnOrdreArbre(this.racine);
-
+			//this.lectureEnOrdreArbre(this.racine);
+			encoder();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -56,21 +56,21 @@ public class Compresseur {
 		// Lire le fichier et mettre les zeros avant et apres chaque lettre pour faire la separation
 
 		//placeHolder
-		Object lettre=null;
 		char aTrouver='a';
 		//placeholder
+		boolean continuer = true;
 
-		while(true)
-		{
-			if (lettre.equals(aTrouver)) {
+		while(continuer)
+		{		
+			if (nodeActive.leftChild.clef.equals(aTrouver)) {
 				code += "0";
-				return;
+				continuer = false;
 			} else {
 				code += 1;
 				nodeActive = nodeActive.rightChild;
 			}
 		}
-
+		System.out.println(code);
 	}
 
 	// parcourir et prendre entre les 0 trouve
