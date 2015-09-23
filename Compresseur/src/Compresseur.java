@@ -6,7 +6,7 @@ import java.util.HashMap;
 public class Compresseur {
 
 	private HashMap<Character, Integer> freqMap = new HashMap<Character, Integer>();
-	private ArrayList<ArrayList<Object>> freqTab = new ArrayList<ArrayList<Object>>();
+	private ArrayList<Node> nodeTab = new ArrayList<Node>();
 	private int somChar=0;
 	private Node racine;
 	private Node nodeActive;
@@ -22,14 +22,11 @@ public class Compresseur {
 				verfierTable(ligne);
 				texte += ligne;
 			}
-			quickSort(freqTab,0,freqTab.size()-1);
-			for(int i=0; i<freqTab.size(); i++) {
-				this.addNode(freqTab.get(i).get(0),freqTab.get(i).get(1));
-				//System.out.println(freqTab.get(i).get(0)+ " " + freqTab.get(i).get(1));
-			}
+			quickSort(nodeTab,0,nodeTab.size()-1);
+			constructHuffmanTree(nodeTab);
 			//System.out.println("============================");
 			//this.lectureEnOrdreArbre(this.racine);
-			encoder();
+			//encoder();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -49,7 +46,7 @@ public class Compresseur {
 		// Lire le fichier et mettre les zeros avant et apres chaque lettre pour faire la separation
 		String code="";
 		//Juste changer le nom du user :P
-		String fileEncoder = "C:\\Users\\maaj\\Desktop\\encode.txt";
+		String fileEncoder = "C:\\Users\\Catherine\\Desktop\\encode.txt.huf";
 
 		for(char aTrouver: texte.toCharArray()){
 			nodeActive=racine;
@@ -65,7 +62,7 @@ public class Compresseur {
 					nodeActive = nodeActive.rightChild;
 				}
 			}
-			//System.out.println(code);
+			System.out.println("1");
 		}
 		try
 		{
@@ -112,39 +109,33 @@ public class Compresseur {
 			somChar++;
 			if(freqMap.get(lettre)==null)
 			{
-				freqMap.put(lettre,freqTab.size());
-				ArrayList<Object> tempo = new ArrayList<Object>();
-				tempo.add(lettre);
-				tempo.add(1);
-				freqTab.add(tempo);
+				freqMap.put(lettre,nodeTab.size());
+				Node newNode = new Node(lettre,1);
+				nodeTab.add(newNode);
 			}
 			else
 			{
 				int indexAAjuster = freqMap.get(lettre);
-				int frequence =(Integer) freqTab.get(indexAAjuster).get(1)+1;
-				ArrayList<Object> tempo = freqTab.get(indexAAjuster);
-				tempo.set(1,frequence);
-				freqTab.set(indexAAjuster,tempo);
+				nodeTab.get(indexAAjuster).freq = (Integer)nodeTab.get(indexAAjuster).freq +1;
 			}
 		}
 	}
 	//Passer a travers la liste pour les placer en ordre
-	private static void quickSort(ArrayList<ArrayList<Object>> tableauDeFrequences,int debut,int fin)
+	private static void quickSort(ArrayList<Node> tableauDeNodes,int debut,int fin)
 	{	//http://java2novice.com/java-sorting-algorithms/quick-sort/
-		ArrayList<Object> pivot = new ArrayList<Object>();
         int i = debut;
         int j = fin;
-        pivot = tableauDeFrequences.get(debut+(fin-debut)/2);
+        Node pivot = tableauDeNodes.get(debut+(fin-debut)/2);
         while (i <= j) {
 
-            while ((Integer)tableauDeFrequences.get(i).get(1) > (Integer)pivot.get(1)) {
+            while ((Integer)tableauDeNodes.get(i).freq < (Integer)pivot.freq) {
                 i++;
             }
-            while ((Integer)tableauDeFrequences.get(j).get(1) < (Integer)pivot.get(1)) {
+            while ((Integer)tableauDeNodes.get(j).freq > (Integer)pivot.freq) {
                 j--;
             }
             if (i <= j) {
-                echanger(tableauDeFrequences, i, j);
+                echanger(tableauDeNodes, i, j);
                 //move index to next position on both sides
                 i++;
                 j--;
@@ -152,42 +143,49 @@ public class Compresseur {
         }
         // call quickSort() method recursively
         if (debut < j)
-            quickSort(tableauDeFrequences, debut, j);
+            quickSort(tableauDeNodes, debut, j);
         if (i < fin)
-            quickSort(tableauDeFrequences, i, fin);
+            quickSort(tableauDeNodes, i, fin);
 	}
 	
-	private static void echanger (ArrayList<ArrayList<Object>> tableauDeFrequences,int indexGrand,int indexPetit) {
-		ArrayList<Object> tempo = tableauDeFrequences.get(indexGrand);
-		tableauDeFrequences.set(indexGrand, tableauDeFrequences.get(indexPetit));
-		tableauDeFrequences.set(indexPetit, tempo);
+	private static void echanger (ArrayList<Node> tableauDeNodes,int indexGrand,int indexPetit) {
+		Node tempo = tableauDeNodes.get(indexGrand);
+		tableauDeNodes.set(indexGrand, tableauDeNodes.get(indexPetit));
+		tableauDeNodes.set(indexPetit, tempo);
 	}
 
 
 	/*--------------------------Arbre---------------------------*/
-
-	public void addNode(Object clef,Object freq)
-	{
-		Node newNode=new Node(clef,freq);
-
-		if (racine==null)
-		{
-			racine=new Node(null,somChar);
-			//racine=newNode;
-			nodeActive=racine;
+	
+	private void constructHuffmanTree(ArrayList<Node> tableauDeNodes){
+		if (tableauDeNodes.size() == 1){
+			return;
 		}
-
-			if (nodeActive.leftChild==null)
-			{
-				//System.out.println("new node"+newNode);
-				nodeActive.leftChild=newNode;
-				somChar=somChar-(Integer)freq;
-
-				nodeActive.rightChild = new Node(null,somChar);
-				nodeActive=nodeActive.rightChild;
+		else {
+			Node newNode = new Node(null,(Integer)tableauDeNodes.get(0).freq + (Integer)tableauDeNodes.get(1).freq);
+			newNode.leftChild = tableauDeNodes.get(0);
+			newNode.rightChild = tableauDeNodes.get(1);
+			tableauDeNodes.remove(0);
+			tableauDeNodes.remove(0);
+			insertionAndSort(tableauDeNodes,newNode);
+			constructHuffmanTree(tableauDeNodes);
+		}
+	}
+	//http://www.algolist.net/Algorithms/Sorting/Insertion_sort
+	private void insertionAndSort(ArrayList<Node> tableauDeNodes,Node newNode) {
+	      int j;
+	      tableauDeNodes.add(newNode);
+	      j = tableauDeNodes.size() - 1;
+	      while (j > 0 && (Integer) tableauDeNodes.get(j - 1).freq >(Integer) newNode.freq) {
+	        	tableauDeNodes.set(j, tableauDeNodes.get(j - 1));
+	            j--;
+	      }
+	      tableauDeNodes.set(j, newNode);
+	      System.out.println("================================================================");
+	      for(int k=0; k<tableauDeNodes.size(); k++) {
+				System.out.println(tableauDeNodes.get(k).clef + " " + tableauDeNodes.get(k).freq);
 			}
-
-		}
+	}
 
 	public void lectureEnOrdreArbre(Node nodeActive)
 	{
