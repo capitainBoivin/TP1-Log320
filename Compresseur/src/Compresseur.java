@@ -6,6 +6,7 @@ import java.util.HashMap;
 public class Compresseur {
 
 	private HashMap<Character, Integer> freqMap = new HashMap<Character, Integer>();
+	private HashMap<Character, String> encodedMap = new HashMap<Character, String>();
 	private ArrayList<Node> nodeTab = new ArrayList<Node>();
 	private int somChar=0;
 	private Node racine;
@@ -24,9 +25,8 @@ public class Compresseur {
 			}
 			quickSort(nodeTab,0,nodeTab.size()-1);
 			constructHuffmanTree(nodeTab);
-			//System.out.println("============================");
-			//this.lectureEnOrdreArbre(this.racine);
-			//encoder();
+			constructEncodedMap(nodeTab.get(0),encodedMap,new String());
+			encoder();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -43,33 +43,21 @@ public class Compresseur {
 	//denombre, par la suite on passe a travers la larbre a la recherhe et la lettre et ajoute les 0 et 1
 	void encoder()
 	{
-		// Lire le fichier et mettre les zeros avant et apres chaque lettre pour faire la separation
-		String code="";
-		//Juste changer le nom du user :P
+		
 		String fileEncoder = "C:\\Users\\Catherine\\Desktop\\encode.txt.huf";
-
+		String code = "";
 		for(char aTrouver: texte.toCharArray()){
-			nodeActive=racine;
-			boolean continuer = true;
-
-			while(continuer)
-			{		
-				if (nodeActive.leftChild.clef.equals(aTrouver)) {
-					code += "0";
-					continuer = false;
-				} else {
-					code += 1;
-					nodeActive = nodeActive.rightChild;
-				}
-			}
-			System.out.println("1");
+			code += encodedMap.get(aTrouver);
 		}
 		try
 		{
+
 			Byte buffer = Byte.valueOf(code);
 			//byte[] buffer = code.getBytes();
 			//http://examples.oreilly.com/jenut/Compress.java
-			FileOutputStream outputStream = new FileOutputStream(fileEncoder);
+			//FileOutputStream outputStream = new FileOutputStream(fileEncoder);
+			DataOutputStream outputStream = new DataOutputStream(new FileOutputStream(fileEncoder));
+
 			outputStream.write(buffer);
 			outputStream.close();
 		}
@@ -181,29 +169,15 @@ public class Compresseur {
 	            j--;
 	      }
 	      tableauDeNodes.set(j, newNode);
-	      System.out.println("================================================================");
-	      for(int k=0; k<tableauDeNodes.size(); k++) {
-				System.out.println(tableauDeNodes.get(k).clef + " " + tableauDeNodes.get(k).freq);
-			}
 	}
-
-	public void lectureEnOrdreArbre(Node nodeActive)
+	//http://codereview.stackexchange.com/questions/44473/huffman-code-implementation
+	public void constructEncodedMap(Node currentNode, HashMap<Character, String> encodedMap, String encodedString)
 	{
-
-		if(nodeActive!=null)
-		{
-			//Voir gauche remonter de 1 et aller a droite
-			System.out.println(nodeActive);
-
-			lectureEnOrdreArbre(nodeActive.leftChild);
-
-			//Par ordre de grandeur
-			//System.out.println(nodeActive);
-
-			lectureEnOrdreArbre(nodeActive.rightChild);
-
-			//Check les deux child dun noeuds et ensuite on remonte
-			//System.out.println(nodeActive);
-		}
+		if (currentNode.leftChild == null && currentNode.rightChild == null) {
+            encodedMap.put((Character)currentNode.clef, encodedString);
+            return;
+        }    
+		constructEncodedMap(currentNode.leftChild, encodedMap, encodedString + '0');
+		constructEncodedMap(currentNode.rightChild, encodedMap, encodedString + '1' );
 	}
 }
