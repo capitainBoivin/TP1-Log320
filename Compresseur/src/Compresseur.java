@@ -66,12 +66,12 @@ public class Compresseur {
 		}
 		try
 		{
-			byte[] buffer = code.getBytes();
+			Byte buffer = Byte.valueOf(code);
+			//byte[] buffer = code.getBytes();
+			//http://examples.oreilly.com/jenut/Compress.java
 			FileOutputStream outputStream = new FileOutputStream(fileEncoder);
 			outputStream.write(buffer);
 			outputStream.close();
-			System.out.println("Wrote " + buffer.length +
-					" bytes");
 		}
 		catch(IOException ex)
 		{
