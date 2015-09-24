@@ -13,6 +13,7 @@ public class Compresseur {
 	private Node nodeActive;
 	private String texte = "";
 	private String ligne;
+	private int paddingBits;
 
 	public void readFile(File f){
 		BufferedReader br = null;
@@ -38,27 +39,19 @@ public class Compresseur {
 		}	
 	}
 
-
 	//Faudrait passer le texte et une charactere a la fois et on sait que chacun des charactere exsite dans ils ont ete
 	//denombre, par la suite on passe a travers la larbre a la recherhe et la lettre et ajoute les 0 et 1
 	void encoder()
 	{
 		
-		String fileEncoder = "C:\\Users\\Catherine\\Desktop\\encode.txt.huf";
-		String code = "";
-		for(char aTrouver: texte.toCharArray()){
-			code += encodedMap.get(aTrouver);
-		}
+		String fileEncoder = "C:\\Users\\Maaj\\Desktop\\encode.txt.huf";
+		byte [] code;
+
+		code=encodeText(texte,encodedMap);
 		try
 		{
-
-			Byte buffer = Byte.valueOf(code);
-			//byte[] buffer = code.getBytes();
-			//http://examples.oreilly.com/jenut/Compress.java
-			//FileOutputStream outputStream = new FileOutputStream(fileEncoder);
-			DataOutputStream outputStream = new DataOutputStream(new FileOutputStream(fileEncoder));
-
-			outputStream.write(buffer);
+			BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(fileEncoder));
+			outputStream.write(code);
 			outputStream.close();
 		}
 		catch(IOException ex)
@@ -179,5 +172,37 @@ public class Compresseur {
         }    
 		constructEncodedMap(currentNode.leftChild, encodedMap, encodedString + '0');
 		constructEncodedMap(currentNode.rightChild, encodedMap, encodedString + '1' );
+	}
+
+
+	private byte[] encodeText(String text, HashMap<Character, String> charCodes) {
+		String encodedTextBits = "";
+		StringBuffer sbEncodedTextBits = new StringBuffer();
+
+		for (int i = 0; i != text.length(); ++i) {
+			sbEncodedTextBits.append(charCodes.get(text.charAt(i)));
+		}
+		encodedTextBits = sbEncodedTextBits.toString();
+
+		ArrayList<String> stringBits = new ArrayList<String>();
+		StringBuffer sbEncodedTextBytes = new StringBuffer();
+
+		for (int i = 0; i != encodedTextBits.length(); ++i) {
+			sbEncodedTextBytes.append(encodedTextBits.charAt(i));
+
+			if (sbEncodedTextBytes.length() == 8 || i == encodedTextBits.length() - 1) {
+				stringBits.add(sbEncodedTextBytes.toString());
+				paddingBits = 8 - sbEncodedTextBytes.length();
+				sbEncodedTextBytes.delete(0, sbEncodedTextBytes.length());
+			}
+		}
+
+		byte[] encodedTextBytes = new byte[stringBits.size()];
+
+		for (int i = 0; i != stringBits.size(); ++i) {
+			encodedTextBytes[i] = (byte)Integer.parseInt(stringBits.get(i), 2);
+		}
+		System.out.println(encodedTextBits);
+		return encodedTextBytes;
 	}
 }
