@@ -48,6 +48,7 @@ public class Compresseur {
 		byte [] code;
 
 		code=encodeText(texte,encodedMap);
+		decodeText(code);
 		try
 		{
 			BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(fileEncoder));
@@ -205,4 +206,66 @@ public class Compresseur {
 		System.out.println(encodedTextBits);
 		return encodedTextBytes;
 	}
+
+
+	//Decoder de bytes en binaire
+	private String decodeText(byte[] fichierEncoder) {
+		StringBuilder sbEncodedText = new StringBuilder();
+		StringBuilder sbText = new StringBuilder();
+		String padString = "00000000";
+		String encodedTextPart = "";
+		String encodedText = "";
+		String text = "";
+
+		for (int i =0; i != fichierEncoder.length; ++i) {
+			encodedTextPart = Integer.toBinaryString(fichierEncoder[i] & 0xFF);
+			if (i != fichierEncoder.length - 1) {
+				sbEncodedText.append(padString.substring(encodedTextPart.length()));
+			} else {
+				sbEncodedText.append(padString.substring(encodedTextPart.length()+this.paddingBits));
+			}
+			sbEncodedText.append(encodedTextPart);
+		}
+
+		encodedText = sbEncodedText.toString();
+		/*
+		if (tree instanceof Node) {
+			Node currentNode = (Node)tree;
+
+			for (int i = 0; i != encodedText.length(); ++i) {
+				if (encodedText.charAt(i) == '0') {
+					if (currentNode.getLeftBranch() instanceof Node) {
+						currentNode = (Node)currentNode.getLeftBranch();
+					} else if (currentNode.getLeftBranch() instanceof Leaf) {
+						sbText.append(((Leaf)currentNode.getLeftBranch()).getCharacter());
+						currentNode = (Node)tree;
+					}
+				} else if (encodedText.charAt(i) == '1') {
+					if (currentNode.getRightBranch() instanceof Node) {
+						currentNode = (Node)currentNode.getRightBranch();
+					} else if (currentNode.getRightBranch() instanceof Leaf) {
+						sbText.append(((Leaf)currentNode.getRightBranch()).getCharacter());
+						currentNode = (Node)tree;
+					}
+				}
+
+			}
+		} else if (tree instanceof Leaf) {
+			Leaf currentLeaf = (Leaf)tree;
+
+			for (int i = 0; i != encodedText.length(); ++i) {
+				sbText.append(currentLeaf.getCharacter());
+			}
+		}
+		*/
+
+		System.out.println(encodedText);
+		return "";
+
+		//text = sbText.toString();
+
+		//return text;
+	}
+
+
 }
