@@ -49,6 +49,7 @@ public class Compresseur {
 
 		code=encodeText(texte,encodedMap);
 		decoder(code);
+
 		try
 		{
 			BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(fileEncoder));
@@ -197,6 +198,7 @@ public class Compresseur {
 
 		byte[] encodedTextBytes = new byte[stringBits.size()];
 
+
 		for (int i = 0; i != stringBits.size(); ++i) {
 			encodedTextBytes[i] = (byte)Integer.parseInt(stringBits.get(i), 2);
 		}
@@ -229,35 +231,43 @@ public class Compresseur {
 		nodeActive=nodeTab.get(0);
 
 
-
-		//for (int i = 0; i != encodedText.length(); ++i)
-		for (int i = 0; i <=20; ++i)
+		for (int i = 0; i != texteFinalBinaire.length(); ++i)
 		{
+			//Aller a gauche si 0, aller a droite si 1
 			if (texteFinalBinaire.charAt(i) == '0') {
 				if (nodeActive.leftChild instanceof Node) {
 					nodeActive = nodeActive.leftChild;
-				} else if (nodeActive.leftChild ==null) {
+				}
+				if (nodeActive.leftChild ==null) {
 					textePropre.append(nodeActive.clef);
-					System.out.println("gauche");
-					System.out.println(nodeActive.clef);
+					//System.out.println("gauche");
+					//System.out.println(nodeActive.clef);
 					nodeActive=nodeTab.get(0);
 				}
 
 			} else if (texteFinalBinaire.charAt(i) == '1') {
 				if (nodeActive.rightChild instanceof Node) {
 					nodeActive = nodeActive.rightChild;
-				} else if (nodeActive.rightChild ==null) {
+				}
+				if (nodeActive.rightChild ==null) {
 					textePropre.append(nodeActive.clef);
-					System.out.println("droite");
-					System.out.println(nodeActive.clef);
+					//System.out.println("droite");
+					//System.out.println(nodeActive.clef);
 					nodeActive=nodeTab.get(0);
 				}
 			}
 
 		}
-
-
 		return textePropre.toString();
+	}
+
+	public void encodeHeader()
+	{
+		;
+	}
+	public void decodeHeader()
+	{
+		;
 	}
 
 
