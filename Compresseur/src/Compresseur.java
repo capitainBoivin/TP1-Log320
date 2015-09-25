@@ -43,11 +43,10 @@ public class Compresseur {
 	//denombre, par la suite on passe a travers la larbre a la recherhe et la lettre et ajoute les 0 et 1
 	void encoder()
 	{
-		
 		String fileEncoder = "C:\\Users\\Maaj\\Desktop\\encode.txt.huf";
 		byte [] code;
 
-		code=encodeText(texte,encodedMap);
+		code=encoderTexte(texte, encodedMap);
 		decoder(code);
 
 		try
@@ -65,8 +64,8 @@ public class Compresseur {
 	void decoder(byte [] code)
 	{
 		String fileDecoder = "C:\\Users\\Maaj\\Desktop\\decode.txt";
+		String textePropre=decoderTexte(code);
 
-		String textePropre=decodeText(code);
 		try
 		{
 			BufferedWriter outWriter = new BufferedWriter(new FileWriter(fileDecoder));
@@ -78,7 +77,6 @@ public class Compresseur {
 			ex.printStackTrace();
 		}
 	}
-
 
 	//Permet de traverser l'arbre
 	void verfierTable(String mot)
@@ -100,6 +98,7 @@ public class Compresseur {
 			}
 		}
 	}
+
 	//Passer a travers la liste pour les placer en ordre
 	private static void quickSort(ArrayList<Node> tableauDeNodes,int debut,int fin)
 	{	//http://java2novice.com/java-sorting-algorithms/quick-sort/
@@ -133,7 +132,6 @@ public class Compresseur {
 		tableauDeNodes.set(indexGrand, tableauDeNodes.get(indexPetit));
 		tableauDeNodes.set(indexPetit, tempo);
 	}
-
 
 	/*--------------------------Arbre---------------------------*/
 	
@@ -173,42 +171,38 @@ public class Compresseur {
 		constructEncodedMap(currentNode.rightChild, encodedMap, encodedString + '1' );
 	}
 
+	private byte[] encoderTexte(String texte, HashMap<Character, String> mapEncoder) {
+		String texteEncodeBinaire = "";
+		StringBuffer sousTexteEncodeBianire = new StringBuffer();
 
-	private byte[] encodeText(String text, HashMap<Character, String> charCodes) {
-		String encodedTextBits = "";
-		StringBuffer sbEncodedTextBits = new StringBuffer();
-
-		for (int i = 0; i != text.length(); ++i) {
-			sbEncodedTextBits.append(charCodes.get(text.charAt(i)));
+		for (int i = 0; i != texte.length(); ++i) {
+			sousTexteEncodeBianire.append(mapEncoder.get(texte.charAt(i)));
 		}
-		encodedTextBits = sbEncodedTextBits.toString();
-
+		texteEncodeBinaire = sousTexteEncodeBianire.toString();
 		ArrayList<String> stringBits = new ArrayList<String>();
-		StringBuffer sbEncodedTextBytes = new StringBuffer();
+		StringBuffer textePropreBinaire = new StringBuffer();
 
-		for (int i = 0; i != encodedTextBits.length(); ++i) {
-			sbEncodedTextBytes.append(encodedTextBits.charAt(i));
+		for (int i = 0; i != texteEncodeBinaire.length(); ++i) {
+			textePropreBinaire.append(texteEncodeBinaire.charAt(i));
 
-			if (sbEncodedTextBytes.length() == 8 || i == encodedTextBits.length() - 1) {
-				stringBits.add(sbEncodedTextBytes.toString());
-				this.paddingBits = 8 - sbEncodedTextBytes.length();
-				sbEncodedTextBytes.delete(0, sbEncodedTextBytes.length());
+			if (textePropreBinaire.length() == 8 || i == texteEncodeBinaire.length() - 1) {
+				stringBits.add(textePropreBinaire.toString());
+				this.paddingBits = 8 - textePropreBinaire.length();
+				textePropreBinaire.delete(0, textePropreBinaire.length());
 			}
 		}
 
-		byte[] encodedTextBytes = new byte[stringBits.size()];
-
+		byte[] texteEcnodeFinal = new byte[stringBits.size()];
 
 		for (int i = 0; i != stringBits.size(); ++i) {
-			encodedTextBytes[i] = (byte)Integer.parseInt(stringBits.get(i), 2);
+			texteEcnodeFinal[i] = (byte)Integer.parseInt(stringBits.get(i), 2);
 		}
-		//System.out.println(encodedTextBits);
-		return encodedTextBytes;
+
+		return texteEcnodeFinal;
 	}
 
-
 	//Decoder de bytes en binaire
-	private String decodeText(byte[] fichierEncoder) {
+	private String decoderTexte(byte[] fichierEncoder) {
 		StringBuilder texteBinaire = new StringBuilder();
 		StringBuilder textePropre = new StringBuilder();
 		String padString = "00000000";
@@ -240,8 +234,6 @@ public class Compresseur {
 				}
 				if (nodeActive.leftChild ==null) {
 					textePropre.append(nodeActive.clef);
-					//System.out.println("gauche");
-					//System.out.println(nodeActive.clef);
 					nodeActive=nodeTab.get(0);
 				}
 
@@ -251,24 +243,116 @@ public class Compresseur {
 				}
 				if (nodeActive.rightChild ==null) {
 					textePropre.append(nodeActive.clef);
-					//System.out.println("droite");
-					//System.out.println(nodeActive.clef);
 					nodeActive=nodeTab.get(0);
 				}
 			}
-
 		}
 		return textePropre.toString();
 	}
 
-	public void encodeHeader()
-	{
-		;
-	}
-	public void decodeHeader()
-	{
-		;
+	/*
+	private byte[] encodeHeader(TreeMap<Character, Integer> sortedFrequencyTable) {
+		int[] headerInt = new int[256];
+		Arrays.fill(headerInt, 0);
+
+		for (Map.Entry<Character, Integer> entry : sortedFrequencyTable.entrySet()) {
+			headerInt[(byte)(char)entry.getKey()] = entry.getValue();
+		}
+
+		String charInFileBits = "";
+		String padString = "00000000000000000000000000000000";
+		StringBuilder sbCharInFileBits = new StringBuilder();
+		StringBuilder sbCharFrequencyInFileBits = new StringBuilder();
+		String frequencyBits = "";
+
+		for (int i = 0; i != headerInt.length; ++i) {
+			if (headerInt[i] == 0) {
+				sbCharInFileBits.append('0');
+			} else {
+				sbCharInFileBits.append('1');
+				frequencyBits = Integer.toBinaryString(headerInt[i]);
+				sbCharFrequencyInFileBits.append(padString.substring(frequencyBits.length()));
+				sbCharFrequencyInFileBits.append(frequencyBits);
+			}
+		}
+
+		charInFileBits = sbCharInFileBits.append(sbCharFrequencyInFileBits.toString()).toString();
+
+		ArrayList<String> stringBits = new ArrayList<String>();
+		StringBuffer sbEncodedTextBytes = new StringBuffer();
+
+		for (int i = 0; i != charInFileBits.length(); ++i) {
+			sbEncodedTextBytes.append(charInFileBits.charAt(i));
+
+			if (sbEncodedTextBytes.length() == 8 || i == charInFileBits.length() - 1) {
+				stringBits.add(sbEncodedTextBytes.toString());
+				sbEncodedTextBytes.delete(0, sbEncodedTextBytes.length());
+			}
+		}
+
+		byte[] headerBytes = new byte[stringBits.size() + 1];
+
+		for (int i = 0; i != stringBits.size(); ++i) {
+			headerBytes[i + 1] = (byte)Integer.parseInt(stringBits.get(i), 2);
+		}
+
+		headerBytes[0] = (byte)this.paddingBits;
+
+		return headerBytes;
 	}
 
+	private TreeMap<Character, Integer> decodeHeader(byte[] encodedFileContent) {
+		HashMap<Character, Integer> frequencyTable = new HashMap<Character, Integer>();
+		this.paddingBits = encodedFileContent[0] & 0xFF;
 
+		StringBuilder sbEncodedHeader = new StringBuilder();
+		String padString = "00000000";
+		String encodedHeaderPart = "";
+		String encodedHeader = "";
+
+		for (int i = 1; i != 33; ++i) {
+			encodedHeaderPart = Integer.toBinaryString(encodedFileContent[i] & 0xFF);
+			sbEncodedHeader.append(padString.substring(encodedHeaderPart.length()));
+			sbEncodedHeader.append(encodedHeaderPart);
+		}
+
+		encodedHeader = sbEncodedHeader.toString();
+
+		int[] frequencies = new int[256];
+		Arrays.fill(frequencies, 0);
+		int currentIndex = 33;
+
+
+		for (int i = 0; i != encodedHeader.length(); ++i) {
+			if (encodedHeader.charAt(i) == '1') {
+				StringBuilder sbEncodedFrequencies = new StringBuilder();
+				String frequencyPart = "";
+				frequencyPart = Integer.toBinaryString(encodedFileContent[currentIndex] & 0xFF);
+				sbEncodedFrequencies.append(padString.substring(frequencyPart.length()));
+				sbEncodedFrequencies.append(frequencyPart);
+				frequencyPart = Integer.toBinaryString(encodedFileContent[currentIndex+1] & 0xFF);
+				sbEncodedFrequencies.append(padString.substring(frequencyPart.length()));
+				sbEncodedFrequencies.append(frequencyPart);
+				frequencyPart = Integer.toBinaryString(encodedFileContent[currentIndex+2] & 0xFF);
+				sbEncodedFrequencies.append(padString.substring(frequencyPart.length()));
+				sbEncodedFrequencies.append(frequencyPart);
+				frequencyPart = Integer.toBinaryString(encodedFileContent[currentIndex+3] & 0xFF);
+				sbEncodedFrequencies.append(padString.substring(frequencyPart.length()));
+				sbEncodedFrequencies.append(frequencyPart);
+				currentIndex += 4;
+
+				frequencyTable.put((char)i, Integer.parseInt(sbEncodedFrequencies.toString(), 2));
+			}
+		}
+
+		this.encodedFileTextBeginIndex = currentIndex;
+
+		MapValueComparator mapValueComparator = new MapValueComparator(frequencyTable);
+		TreeMap<Character, Integer> sortedFrequencyTable = new TreeMap<Character, Integer>(mapValueComparator);
+		sortedFrequencyTable.putAll(frequencyTable);
+
+		return sortedFrequencyTable;
+	}
+
+*/
 }
