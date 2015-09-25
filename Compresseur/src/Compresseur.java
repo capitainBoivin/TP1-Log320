@@ -48,7 +48,7 @@ public class Compresseur {
 		byte [] code;
 
 		code=encodeText(texte,encodedMap);
-		decodeText(code);
+		decoder(code);
 		try
 		{
 			BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(fileEncoder));
@@ -61,25 +61,22 @@ public class Compresseur {
 		}
 	}
 
-	// parcourir et prendre entre les 0 trouve
-	void decoder()
+	void decoder(byte [] code)
 	{
-	//Chacun des characteres entre 0 et 1
-		nodeActive=racine;
-		char binaire='0';
-		Object trouver;
-		if(binaire==1)
-		{
-			nodeActive=nodeActive.rightChild;
-		}
-		else
-		{
-			trouver=nodeActive.clef;
-		}
-	//Ensuite mettre les lettres une apres lautre.
+		String fileDecoder = "C:\\Users\\Maaj\\Desktop\\decode.txt";
 
+		String textePropre=decodeText(code);
+		try
+		{
+			BufferedWriter outWriter = new BufferedWriter(new FileWriter(fileDecoder));
+			outWriter.write(textePropre);
+			outWriter.close();
+		}
+		catch(IOException ex)
+		{
+			ex.printStackTrace();
+		}
 	}
-
 
 
 	//Permet de traverser l'arbre
@@ -203,68 +200,64 @@ public class Compresseur {
 		for (int i = 0; i != stringBits.size(); ++i) {
 			encodedTextBytes[i] = (byte)Integer.parseInt(stringBits.get(i), 2);
 		}
-		System.out.println(encodedTextBits);
+		//System.out.println(encodedTextBits);
 		return encodedTextBytes;
 	}
 
 
 	//Decoder de bytes en binaire
 	private String decodeText(byte[] fichierEncoder) {
-		StringBuilder sbEncodedText = new StringBuilder();
-		StringBuilder sbText = new StringBuilder();
+		StringBuilder texteBinaire = new StringBuilder();
+		StringBuilder textePropre = new StringBuilder();
 		String padString = "00000000";
-		String encodedTextPart = "";
-		String encodedText = "";
-		String text = "";
+		String texteFinalEncoder = "";
+		String texteFinalBinaire = "";
 
+		//decoder et remettre en binaire
 		for (int i =0; i != fichierEncoder.length; ++i) {
-			encodedTextPart = Integer.toBinaryString(fichierEncoder[i] & 0xFF);
+			texteFinalEncoder = Integer.toBinaryString(fichierEncoder[i] & 0xFF);
 			if (i != fichierEncoder.length - 1) {
-				sbEncodedText.append(padString.substring(encodedTextPart.length()));
+				texteBinaire.append(padString.substring(texteFinalEncoder.length()));
 			} else {
-				sbEncodedText.append(padString.substring(encodedTextPart.length()+this.paddingBits));
+				texteBinaire.append(padString.substring(texteFinalEncoder.length()+this.paddingBits));
 			}
-			sbEncodedText.append(encodedTextPart);
+			texteBinaire.append(texteFinalEncoder);
 		}
 
-		encodedText = sbEncodedText.toString();
-		/*
-		if (tree instanceof Node) {
-			Node currentNode = (Node)tree;
+		texteFinalBinaire = texteBinaire.toString();
 
-			for (int i = 0; i != encodedText.length(); ++i) {
-				if (encodedText.charAt(i) == '0') {
-					if (currentNode.getLeftBranch() instanceof Node) {
-						currentNode = (Node)currentNode.getLeftBranch();
-					} else if (currentNode.getLeftBranch() instanceof Leaf) {
-						sbText.append(((Leaf)currentNode.getLeftBranch()).getCharacter());
-						currentNode = (Node)tree;
-					}
-				} else if (encodedText.charAt(i) == '1') {
-					if (currentNode.getRightBranch() instanceof Node) {
-						currentNode = (Node)currentNode.getRightBranch();
-					} else if (currentNode.getRightBranch() instanceof Leaf) {
-						sbText.append(((Leaf)currentNode.getRightBranch()).getCharacter());
-						currentNode = (Node)tree;
-					}
+		nodeActive=nodeTab.get(0);
+
+
+
+		//for (int i = 0; i != encodedText.length(); ++i)
+		for (int i = 0; i <=20; ++i)
+		{
+			if (texteFinalBinaire.charAt(i) == '0') {
+				if (nodeActive.leftChild instanceof Node) {
+					nodeActive = nodeActive.leftChild;
+				} else if (nodeActive.leftChild ==null) {
+					textePropre.append(nodeActive.clef);
+					System.out.println("gauche");
+					System.out.println(nodeActive.clef);
+					nodeActive=nodeTab.get(0);
 				}
 
+			} else if (texteFinalBinaire.charAt(i) == '1') {
+				if (nodeActive.rightChild instanceof Node) {
+					nodeActive = nodeActive.rightChild;
+				} else if (nodeActive.rightChild ==null) {
+					textePropre.append(nodeActive.clef);
+					System.out.println("droite");
+					System.out.println(nodeActive.clef);
+					nodeActive=nodeTab.get(0);
+				}
 			}
-		} else if (tree instanceof Leaf) {
-			Leaf currentLeaf = (Leaf)tree;
 
-			for (int i = 0; i != encodedText.length(); ++i) {
-				sbText.append(currentLeaf.getCharacter());
-			}
 		}
-		*/
 
-		System.out.println(encodedText);
-		return "";
 
-		//text = sbText.toString();
-
-		//return text;
+		return textePropre.toString();
 	}
 
 
