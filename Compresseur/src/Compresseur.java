@@ -190,7 +190,7 @@ public class Compresseur {
 
 			if (sbEncodedTextBytes.length() == 8 || i == encodedTextBits.length() - 1) {
 				stringBits.add(sbEncodedTextBytes.toString());
-				paddingBits = 8 - sbEncodedTextBytes.length();
+				this.paddingBits = 8 - sbEncodedTextBytes.length();
 				sbEncodedTextBytes.delete(0, sbEncodedTextBytes.length());
 			}
 		}
