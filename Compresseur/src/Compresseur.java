@@ -1,6 +1,8 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class Compresseur {
@@ -45,8 +47,14 @@ public class Compresseur {
 	{
 		String fileEncoder = "C:\\Users\\Maaj\\Desktop\\encode.txt.huf";
 		byte [] code;
+		byte [] headerEncoder;
+
+		System.out.println("hashmap avant de cath");
+		System.out.println(freqMap);
 
 		code=encoderTexte(texte, encodedMap);
+		headerEncoder=encodeHeader(freqMap);
+		decodeHeader(headerEncoder);
 		decoder(code);
 
 		try
@@ -250,12 +258,12 @@ public class Compresseur {
 		return textePropre.toString();
 	}
 
-	/*
-	private byte[] encodeHeader(TreeMap<Character, Integer> sortedFrequencyTable) {
+
+	private byte[] encodeHeader(HashMap<Character, Integer> freqMap) {
 		int[] headerInt = new int[256];
 		Arrays.fill(headerInt, 0);
 
-		for (Map.Entry<Character, Integer> entry : sortedFrequencyTable.entrySet()) {
+		for (Map.Entry<Character, Integer> entry : freqMap.entrySet()) {
 			headerInt[(byte)(char)entry.getKey()] = entry.getValue();
 		}
 
@@ -298,12 +306,17 @@ public class Compresseur {
 
 		headerBytes[0] = (byte)this.paddingBits;
 
+		System.out.println("header encode");
+		System.out.println(headerBytes);
 		return headerBytes;
 	}
 
-	private TreeMap<Character, Integer> decodeHeader(byte[] encodedFileContent) {
+
+
+
+	private HashMap<Character, Integer> decodeHeader(byte[] arbreEncoder) {
 		HashMap<Character, Integer> frequencyTable = new HashMap<Character, Integer>();
-		this.paddingBits = encodedFileContent[0] & 0xFF;
+		this.paddingBits = arbreEncoder[0] & 0xFF;
 
 		StringBuilder sbEncodedHeader = new StringBuilder();
 		String padString = "00000000";
@@ -311,7 +324,7 @@ public class Compresseur {
 		String encodedHeader = "";
 
 		for (int i = 1; i != 33; ++i) {
-			encodedHeaderPart = Integer.toBinaryString(encodedFileContent[i] & 0xFF);
+			encodedHeaderPart = Integer.toBinaryString(arbreEncoder[i] & 0xFF);
 			sbEncodedHeader.append(padString.substring(encodedHeaderPart.length()));
 			sbEncodedHeader.append(encodedHeaderPart);
 		}
@@ -327,16 +340,16 @@ public class Compresseur {
 			if (encodedHeader.charAt(i) == '1') {
 				StringBuilder sbEncodedFrequencies = new StringBuilder();
 				String frequencyPart = "";
-				frequencyPart = Integer.toBinaryString(encodedFileContent[currentIndex] & 0xFF);
+				frequencyPart = Integer.toBinaryString(arbreEncoder[currentIndex] & 0xFF);
 				sbEncodedFrequencies.append(padString.substring(frequencyPart.length()));
 				sbEncodedFrequencies.append(frequencyPart);
-				frequencyPart = Integer.toBinaryString(encodedFileContent[currentIndex+1] & 0xFF);
+				frequencyPart = Integer.toBinaryString(arbreEncoder[currentIndex+1] & 0xFF);
 				sbEncodedFrequencies.append(padString.substring(frequencyPart.length()));
 				sbEncodedFrequencies.append(frequencyPart);
-				frequencyPart = Integer.toBinaryString(encodedFileContent[currentIndex+2] & 0xFF);
+				frequencyPart = Integer.toBinaryString(arbreEncoder[currentIndex+2] & 0xFF);
 				sbEncodedFrequencies.append(padString.substring(frequencyPart.length()));
 				sbEncodedFrequencies.append(frequencyPart);
-				frequencyPart = Integer.toBinaryString(encodedFileContent[currentIndex+3] & 0xFF);
+				frequencyPart = Integer.toBinaryString(arbreEncoder[currentIndex+3] & 0xFF);
 				sbEncodedFrequencies.append(padString.substring(frequencyPart.length()));
 				sbEncodedFrequencies.append(frequencyPart);
 				currentIndex += 4;
@@ -344,15 +357,19 @@ public class Compresseur {
 				frequencyTable.put((char)i, Integer.parseInt(sbEncodedFrequencies.toString(), 2));
 			}
 		}
-
+		System.out.println("frequence decoder");
+		System.out.println(frequencyTable);
+		return frequencyTable;
+		/*
 		this.encodedFileTextBeginIndex = currentIndex;
 
+
+
 		MapValueComparator mapValueComparator = new MapValueComparator(frequencyTable);
-		TreeMap<Character, Integer> sortedFrequencyTable = new TreeMap<Character, Integer>(mapValueComparator);
+		HashMap<Character, Integer> sortedFrequencyTable = new HashMap<Character, Integer>(mapValueComparator);
 		sortedFrequencyTable.putAll(frequencyTable);
 
-		return sortedFrequencyTable;
+		return sortedFrequencyTable;*/
 	}
 
-*/
 }
