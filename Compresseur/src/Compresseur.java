@@ -27,8 +27,10 @@ public class Compresseur {
 				texte += ligne;
 			}
 			quickSort(nodeTab,0,nodeTab.size()-1);
+			//Sacrer nodeTab dans un autre variable.
 			constructHuffmanTree(nodeTab);
 			constructEncodedMap(nodeTab.get(0),encodedMap,new String());
+			//Rappeler constrcut HuffmanTree
 			encoder();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -45,7 +47,7 @@ public class Compresseur {
 	//denombre, par la suite on passe a travers la larbre a la recherhe et la lettre et ajoute les 0 et 1
 	void encoder()
 	{
-		String fileEncoder = "C:\\Users\\Maaj\\Desktop\\encode.txt.huf";
+		String fileEncoder = "C:\\Users\\Catherine\\Desktop\\encode.txt.huf";
 		byte [] code;
 		byte [] headerEncoder;
 
@@ -71,7 +73,7 @@ public class Compresseur {
 
 	void decoder(byte [] code)
 	{
-		String fileDecoder = "C:\\Users\\Maaj\\Desktop\\decode.txt";
+		String fileDecoder = "C:\\Users\\Catherine\\Desktop\\decode.txt";
 		String textePropre=decoderTexte(code);
 
 		try
@@ -168,7 +170,8 @@ public class Compresseur {
 	      }
 	      tableauDeNodes.set(j, newNode);
 	}
-	//http://codereview.stackexchange.com/questions/44473/huffman-code-implementation
+
+	// Début de la référence http://codereview.stackexchange.com/questions/44473/huffman-code-implementation
 	public void constructEncodedMap(Node currentNode, HashMap<Character, String> encodedMap, String encodedString)
 	{
 		if (currentNode.leftChild == null && currentNode.rightChild == null) {
@@ -177,7 +180,7 @@ public class Compresseur {
         }    
 		constructEncodedMap(currentNode.leftChild, encodedMap, encodedString + '0');
 		constructEncodedMap(currentNode.rightChild, encodedMap, encodedString + '1' );
-	}
+	} //Fin de la référence
 
 	private byte[] encoderTexte(String texte, HashMap<Character, String> mapEncoder) {
 		String texteEncodeBinaire = "";
