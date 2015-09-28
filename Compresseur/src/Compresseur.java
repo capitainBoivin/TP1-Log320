@@ -259,117 +259,118 @@ public class Compresseur {
 	}
 
 
+	//Ecnoder le header avec la table de frequence
 	private byte[] encodeHeader(HashMap<Character, Integer> freqMap) {
-		int[] headerInt = new int[256];
-		Arrays.fill(headerInt, 0);
+		//Se faire un array de 256 a 0 pour se faire un array assez gros et controler
+		int[] entierHeader = new int[256];
+		Arrays.fill(entierHeader, 0);
 
+		//Aller cherhcer chacun des caracteres dans notre table de frequence
 		for (Map.Entry<Character, Integer> entry : freqMap.entrySet()) {
-			headerInt[(byte)(char)entry.getKey()] = entry.getValue();
+			entierHeader[(byte)(char)entry.getKey()] = entry.getValue();
 		}
 
-		String charInFileBits = "";
-		String padString = "00000000000000000000000000000000";
-		StringBuilder sbCharInFileBits = new StringBuilder();
-		StringBuilder sbCharFrequencyInFileBits = new StringBuilder();
-		String frequencyBits = "";
+		//Variables pour travailler avec et qui servent de tempo
+		String charDesBytes = "";
+		StringBuilder sousCharDesBytes = new StringBuilder();
+		String bufferString = "00000000000000000000000000000000";
+		String frequence = "";
+		StringBuilder sousFredMap = new StringBuilder();
 
-		for (int i = 0; i != headerInt.length; ++i) {
-			if (headerInt[i] == 0) {
-				sbCharInFileBits.append('0');
+		//Passage en binaire des frequences
+		for (int i = 0; i != entierHeader.length; i++) {
+			if (entierHeader[i] == 0) {
+				sousCharDesBytes.append('0');
 			} else {
-				sbCharInFileBits.append('1');
-				frequencyBits = Integer.toBinaryString(headerInt[i]);
-				sbCharFrequencyInFileBits.append(padString.substring(frequencyBits.length()));
-				sbCharFrequencyInFileBits.append(frequencyBits);
+				sousCharDesBytes.append('1');
+				frequence = Integer.toBinaryString(entierHeader[i]);
+				sousFredMap.append(bufferString.substring(frequence.length()));
+				sousFredMap.append(frequence);
 			}
 		}
 
-		charInFileBits = sbCharInFileBits.append(sbCharFrequencyInFileBits.toString()).toString();
+		charDesBytes = sousCharDesBytes.append(sousFredMap.toString()).toString();
+
 
 		ArrayList<String> stringBits = new ArrayList<String>();
-		StringBuffer sbEncodedTextBytes = new StringBuffer();
+		StringBuffer sousTexteEncoder = new StringBuffer();
 
-		for (int i = 0; i != charInFileBits.length(); ++i) {
-			sbEncodedTextBytes.append(charInFileBits.charAt(i));
+		//Faire des compressions en 8 bit pour encoder le header
+		for (int i = 0; i != charDesBytes.length(); ++i) {
+			sousTexteEncoder.append(charDesBytes.charAt(i));
 
-			if (sbEncodedTextBytes.length() == 8 || i == charInFileBits.length() - 1) {
-				stringBits.add(sbEncodedTextBytes.toString());
-				sbEncodedTextBytes.delete(0, sbEncodedTextBytes.length());
+			if (sousTexteEncoder.length() == 8 || i == charDesBytes.length() - 1) {
+				stringBits.add(sousTexteEncoder.toString());
+				sousTexteEncoder.delete(0, sousTexteEncoder.length());
 			}
 		}
 
-		byte[] headerBytes = new byte[stringBits.size() + 1];
+		byte[] bytesDepart = new byte[stringBits.size() + 1];
 
 		for (int i = 0; i != stringBits.size(); ++i) {
-			headerBytes[i + 1] = (byte)Integer.parseInt(stringBits.get(i), 2);
+			bytesDepart[i + 1] = (byte)Integer.parseInt(stringBits.get(i), 2);
 		}
 
-		headerBytes[0] = (byte)this.paddingBits;
+		//Ajout des bit de pading pour avoir une grandeur fixe et pour permettre de bien decoder
+		bytesDepart[0] = (byte)this.paddingBits;
 
 		System.out.println("header encode");
-		System.out.println(headerBytes);
-		return headerBytes;
+		System.out.println(bytesDepart);
+		return bytesDepart;
 	}
 
 
 
 
 	private HashMap<Character, Integer> decodeHeader(byte[] arbreEncoder) {
-		HashMap<Character, Integer> frequencyTable = new HashMap<Character, Integer>();
+		HashMap<Character, Integer> freqMap = new HashMap<Character, Integer>();
 		this.paddingBits = arbreEncoder[0] & 0xFF;
 
-		StringBuilder sbEncodedHeader = new StringBuilder();
+		StringBuilder sousHeaderEncoder = new StringBuilder();
 		String padString = "00000000";
-		String encodedHeaderPart = "";
-		String encodedHeader = "";
+		String headerEncoderTempo = "";
+		String headerEncoder = "";
 
 		for (int i = 1; i != 33; ++i) {
-			encodedHeaderPart = Integer.toBinaryString(arbreEncoder[i] & 0xFF);
-			sbEncodedHeader.append(padString.substring(encodedHeaderPart.length()));
-			sbEncodedHeader.append(encodedHeaderPart);
+			headerEncoderTempo = Integer.toBinaryString(arbreEncoder[i] & 0xFF);
+			sousHeaderEncoder.append(padString.substring(headerEncoderTempo.length()));
+			sousHeaderEncoder.append(headerEncoderTempo);
 		}
 
-		encodedHeader = sbEncodedHeader.toString();
+		headerEncoder = sousHeaderEncoder.toString();
 
-		int[] frequencies = new int[256];
-		Arrays.fill(frequencies, 0);
-		int currentIndex = 33;
+		//Variable de 256 pour la frequence comme pour lencodage
+		int[] frequence = new int[256];
+		//Remplissage de la variable avec du vide
+		Arrays.fill(frequence, 0);
+
+		int index =33;
 
 
-		for (int i = 0; i != encodedHeader.length(); ++i) {
-			if (encodedHeader.charAt(i) == '1') {
-				StringBuilder sbEncodedFrequencies = new StringBuilder();
-				String frequencyPart = "";
-				frequencyPart = Integer.toBinaryString(arbreEncoder[currentIndex] & 0xFF);
-				sbEncodedFrequencies.append(padString.substring(frequencyPart.length()));
-				sbEncodedFrequencies.append(frequencyPart);
-				frequencyPart = Integer.toBinaryString(arbreEncoder[currentIndex+1] & 0xFF);
-				sbEncodedFrequencies.append(padString.substring(frequencyPart.length()));
-				sbEncodedFrequencies.append(frequencyPart);
-				frequencyPart = Integer.toBinaryString(arbreEncoder[currentIndex+2] & 0xFF);
-				sbEncodedFrequencies.append(padString.substring(frequencyPart.length()));
-				sbEncodedFrequencies.append(frequencyPart);
-				frequencyPart = Integer.toBinaryString(arbreEncoder[currentIndex+3] & 0xFF);
-				sbEncodedFrequencies.append(padString.substring(frequencyPart.length()));
-				sbEncodedFrequencies.append(frequencyPart);
-				currentIndex += 4;
+		for (int i = 0; i != headerEncoder.length(); ++i) {
+			if (headerEncoder.charAt(i) == '1') {
+				StringBuilder sousFrenquenceTempo = new StringBuilder();
+				String frenquenceTempo = "";
+				frenquenceTempo = Integer.toBinaryString(arbreEncoder[index] & 0xFF);
+				sousFrenquenceTempo.append(padString.substring(frenquenceTempo.length()));
+				sousFrenquenceTempo.append(frenquenceTempo);
+				frenquenceTempo = Integer.toBinaryString(arbreEncoder[index+1] & 0xFF);
+				sousFrenquenceTempo.append(padString.substring(frenquenceTempo.length()));
+				sousFrenquenceTempo.append(frenquenceTempo);
+				frenquenceTempo = Integer.toBinaryString(arbreEncoder[index+2] & 0xFF);
+				sousFrenquenceTempo.append(padString.substring(frenquenceTempo.length()));
+				sousFrenquenceTempo.append(frenquenceTempo);
+				frenquenceTempo = Integer.toBinaryString(arbreEncoder[index+3] & 0xFF);
+				sousFrenquenceTempo.append(padString.substring(frenquenceTempo.length()));
+				sousFrenquenceTempo.append(frenquenceTempo);
+				index += 4;
 
-				frequencyTable.put((char)i, Integer.parseInt(sbEncodedFrequencies.toString(), 2));
+				freqMap.put((char)i, Integer.parseInt(sousFrenquenceTempo.toString(), 2));
 			}
 		}
 		System.out.println("frequence decoder");
-		System.out.println(frequencyTable);
-		return frequencyTable;
-		/*
-		this.encodedFileTextBeginIndex = currentIndex;
-
-
-
-		MapValueComparator mapValueComparator = new MapValueComparator(frequencyTable);
-		HashMap<Character, Integer> sortedFrequencyTable = new HashMap<Character, Integer>(mapValueComparator);
-		sortedFrequencyTable.putAll(frequencyTable);
-
-		return sortedFrequencyTable;*/
+		System.out.println(freqMap);
+		return freqMap;
 	}
 
 }
