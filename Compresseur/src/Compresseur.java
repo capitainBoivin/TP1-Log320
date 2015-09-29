@@ -14,11 +14,13 @@ public class Compresseur {
 	private int somChar=0;
 	private Node racine;
 	private Node nodeActive;
-	private String texte;
+	private StringBuilder sousTexte=new StringBuilder();
+	private String texte="";
 	private String ligne;
 	private int paddingBits;
 	private byte [] code;
 	private int indexLecture;
+	private Boolean debugMode=true;
 
 
 	public void readFile(File f){
@@ -35,8 +37,11 @@ public class Compresseur {
 				br = new BufferedReader(new FileReader(f));
 				while ((ligne = br.readLine()) != null) {
 					verfierTable(ligne);
-					texte += ligne;
+					sousTexte.append(ligne);
+					//texte += ligne;
 				}
+				texte=sousTexte.toString();
+
 
 				quickSort(nodeTab,0,nodeTab.size()-1);
 
@@ -78,10 +83,12 @@ public class Compresseur {
 		//Fichier hardcoder....cause!!
 		String fileEncoder = "C:\\Users\\Maaj\\Desktop\\encode.txt.huf";
 
-		byte [] headerEncoder;
+		byte [] headerEncoder=null;
 
 		//Encodage du header
-		headerEncoder=encodeHeader(nodeTabTempo);
+		if(!debugMode) {
+			headerEncoder = encodeHeader(nodeTabTempo);
+		}
 		//Code est le fichier encoder avec le map
 		code=encoderTexte(texte, encodedMap);
 
@@ -89,7 +96,9 @@ public class Compresseur {
 		try
 		{
 			BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(fileEncoder));
-			outputStream.write(headerEncoder);
+			if(!debugMode) {
+				outputStream.write(headerEncoder);
+			}
 			outputStream.write(code);
 			outputStream.close();
 		}
@@ -104,7 +113,9 @@ public class Compresseur {
 		String fileDecoder = "C:\\Users\\Maaj\\Desktop\\decode.txt";
 
 		//Decodage du header et du code en utilisant le code lu
-		ArrayList headerDecoder=decodeHeader(code);
+		if(!debugMode) {
+			ArrayList headerDecoder = decodeHeader(code);
+		}
 		String textePropre=decoderTexte(code);
 
 		try
@@ -322,12 +333,13 @@ public class Compresseur {
 			entierHeader[(byte)(char)entry.getKey()] = entry.getValue();
 		}*/
 
-		for (Node entrer : nodeTab) {
+		//A faire marcher
+		/*for (Node entrer : nodeTab) {
 
 			entierHeader[(byte)(char)(entrer.clef)]=entrer.freq;
 			System.out.println(entrer.clef);
 			System.out.println(entrer.freq);
-		}
+		}*/
 
 
 
