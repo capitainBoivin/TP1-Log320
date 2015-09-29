@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
+
 
 
 public class Compresseur {
@@ -19,7 +19,7 @@ public class Compresseur {
 	private int paddingBits;
 	private byte [] code;
 	private int indexLecture;
-	private Boolean debugMode=true;
+	private Boolean debugMode=false;
 
 
 	public void readFile(File f){
@@ -329,25 +329,10 @@ public class Compresseur {
 		int[] entierHeader = new int[256];
 		Arrays.fill(entierHeader, 0);
 
-		//Aller cherhcer chacun des caracteres dans notre table de frequence
-		/*for (Map.Entry<Character, Integer> entry : freqMap.entrySet()) {
-			entierHeader[(byte)(char)entry.getKey()] = entry.getValue();
-		}*/
-
-		//A faire marcher
-		/*for (Node entrer : nodeTab) {
-
-			entierHeader[(byte)(char)(entrer.clef)]=entrer.freq;
-			System.out.println(entrer.clef);
-			System.out.println(entrer.freq);
-		}*/
-
-
-
-		System.out.println("entier header");
-		System.out.println(entierHeader);
-
-
+		//On passe a travers la liste et on associe la frequence au code binaire de la lettre.
+		for (Node entrer : nodeTab) {
+			entierHeader[entrer.clef.toString().getBytes()[0]]=(Integer)entrer.freq;
+		}
 
 		//M[eme principe de recipient encore avec la padding de bits pou l<ajustement en 16 bit
 		String charDesBytes = "";
@@ -394,14 +379,11 @@ public class Compresseur {
 		//Mettre notre padding dans un indice pour le reutiliser
 		bytesDepart[0] = (byte)this.paddingBits;
 
-		System.out.println("header encode");
-		System.out.println(bytesDepart);
 		return bytesDepart;
 	}
 
 	//Decode le header dans le fichier
 	private ArrayList<Node> decodeHeader(byte[] texteEncoder) {
-		//HashMap<Character, Integer> freqMap = new HashMap<Character, Integer>();
 		//Array pour refaire un tableau de fr/quence pour refaire l'arbre
 		ArrayList<Node> nodeFreq=new ArrayList<Node>();
 		//Aller chercher le type de padding mis dans le texte pour l'utiliser
@@ -462,18 +444,12 @@ public class Compresseur {
 		//Pour ne pas relire le header en decodant le texte, on me l'index a un point a commencer
 		this.indexLecture = index;
 
-		/*MapValueComparator mapValueComparator = new MapValueComparator(frequencyTable);
-		TreeMap<Character, Integer> sortedFrequencyTable = new TreeMap<Character, Integer>(mapValueComparator);
-		sortedFrequencyTable.putAll(frequencyTable);*/
-
 		//Refaire les etapes pour bien faire l'arbre
 		quickSort(nodeFreq, 0, nodeFreq.size() - 1);
 		encodedMap=new HashMap<Character, String>();
 		constructHuffmanTree(nodeFreq);
 		constructEncodedMap(nodeFreq.get(0),encodedMap,new String());
 
-		System.out.println("frequence decoder");
-		System.out.println(nodeFreq);
 		nodeTab= new ArrayList<Node>(nodeFreq);
 		return nodeFreq;
 	}
