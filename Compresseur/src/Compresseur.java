@@ -12,7 +12,6 @@ public class Compresseur {
 	private ArrayList<Node> nodeTab = new ArrayList<Node>();
 	private ArrayList<Node> nodeTabTempo;
 	private int somChar=0;
-	private Node racine;
 	private Node nodeActive;
 	private StringBuilder sousTexte=new StringBuilder();
 	private String texte="";
@@ -31,8 +30,9 @@ public class Compresseur {
 			String extension = fichier.substring(fichier.indexOf("."));
 
 			//Verifier le type de fichier
-			if(extension.equals(".txt"))
+			if(extension.equals(".txt") || extension.equals(".jpg"))
 			{
+				indexLecture=0;
 				//Lire le fichier
 				br = new BufferedReader(new FileReader(f));
 				while ((ligne = br.readLine()) != null) {
@@ -111,6 +111,7 @@ public class Compresseur {
 	void decoder(byte[] code)
 	{
 		String fileDecoder = "C:\\Users\\Maaj\\Desktop\\decode.txt";
+		//String fileDecoder = "C:\\Users\\Maaj\\Desktop\\decode.jpg";
 
 		//Decodage du header et du code en utilisant le code lu
 		if(!debugMode) {
@@ -241,7 +242,7 @@ public class Compresseur {
 		StringBuffer sousTexteEncodeBianire = new StringBuffer();
 
 		//Lire chacun des caracteres jusqua la fin du texte
-		for (int i = 0; i != texte.length(); ++i) {
+		for (int i = 0; i != texte.length(); i++) {
 			sousTexteEncodeBianire.append(mapEncoder.get(texte.charAt(i)));
 		}
 		//Faire une grande chaine et le mettre dans le string
