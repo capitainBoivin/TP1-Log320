@@ -153,18 +153,10 @@ public class Compresseur {
 		}
 	}
 
-	//Permet seulement de voir les elements pour une question de debuggage
-	public void verifierChaine(ArrayList liste)
-	{
-		for (Object element:liste)
-		{
-			System.out.println(element);
-		}
-	}
 
 	//Passer a travers la liste pour les placer en ordre
 	private static void quickSort(ArrayList<Node> tableauDeNodes,int debut,int fin)
-	{	//http://java2novice.com/java-sorting-algorithms/quick-sort/
+	{	//Début de la référence http://java2novice.com/java-sorting-algorithms/quick-sort/
         int i = debut;
         int j = fin;
         Node pivot = tableauDeNodes.get(debut+(fin-debut)/2);
@@ -188,7 +180,7 @@ public class Compresseur {
             quickSort(tableauDeNodes, debut, j);
         if (i < fin)
             quickSort(tableauDeNodes, i, fin);
-	}
+	}//Fin de la référence
 
 	//Changement entre les nodes
 	private static void echanger (ArrayList<Node> tableauDeNodes,int indexGrand,int indexPetit) {
@@ -214,7 +206,7 @@ public class Compresseur {
 			constructHuffmanTree(tableauDeNodes);
 		}
 	}
-	//http://www.algolist.net/Algorithms/Sorting/Insertion_sort
+
 	private void insertionAndSort(ArrayList<Node> tableauDeNodes,Node newNode) {
 	      int j;
 	      tableauDeNodes.add(newNode);
@@ -226,7 +218,7 @@ public class Compresseur {
 	      tableauDeNodes.set(j, newNode);
 	}
 
-	// D�but de la r�f�rence http://codereview.stackexchange.com/questions/44473/huffman-code-implementation
+	// Début de la référence http://codereview.stackexchange.com/questions/44473/huffman-code-implementation
 	public void constructEncodedMap(Node currentNode, HashMap<Character, String> encodedMap, String encodedString)
 	{
 		if (currentNode.leftChild == null && currentNode.rightChild == null) {
@@ -235,7 +227,7 @@ public class Compresseur {
         }    
 		constructEncodedMap(currentNode.leftChild, encodedMap, encodedString + '0');
 		constructEncodedMap(currentNode.rightChild, encodedMap, encodedString + '1' );
-	} //Fin de la r�f�rence
+	} //Fin de la référence
 
 	//Encoder le texte sans le header
 	private byte[] encoderTexte(String texte, HashMap<Character, String> mapEncoder) {
