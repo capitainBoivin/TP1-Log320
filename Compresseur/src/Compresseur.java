@@ -30,7 +30,7 @@ public class Compresseur {
 			String extension = fichier.substring(fichier.indexOf("."));
 
 			//Verifier le type de fichier
-			if(extension.equals(".txt") || extension.equals(".jpg"))
+			if(extension.equals(".txt") || extension.equals(".png"))
 			{
 				indexLecture=0;
 				//Lire le fichier
@@ -38,7 +38,8 @@ public class Compresseur {
 				while ((ligne = br.readLine()) != null) {
 					verfierTable(ligne);
 					sousTexte.append(ligne);
-					//texte += ligne;
+					//Ajouter les espaces
+					//sousTexte.append(System.lineSeparator());
 				}
 				texte=sousTexte.toString();
 
@@ -111,7 +112,7 @@ public class Compresseur {
 	void decoder(byte[] code)
 	{
 		String fileDecoder = "C:\\Users\\Maaj\\Desktop\\decode.txt";
-		//String fileDecoder = "C:\\Users\\Maaj\\Desktop\\decode.jpg";
+		//String fileDecoder = "C:\\Users\\Maaj\\Desktop\\decode.png";
 
 		//Decodage du header et du code en utilisant le code lu
 		if(!debugMode) {
